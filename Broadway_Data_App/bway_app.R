@@ -1,6 +1,7 @@
 library(shiny)
 library(ggplot2)
 library(dplyr)
+library(plotly)
 bway <- read.csv("Broadway_Prettified.csv")
 bway$Month_<- as.integer(factor(bway$Month, levels = month.name))
 bway$Avg..Ticket.Price<-as.integer(bway$Avg..Ticket.Price)
@@ -29,7 +30,7 @@ bway$Avg..Ticket.Price<-as.integer(bway$Avg..Ticket.Price)
 
 
 # Input: Specification of range within an interval ----
-      sliderInput(inputId = "year_range",
+sliderInput(inputId = "Year",
             label = "Year Range:",
             min = 2000, max = 2020,
             step = 1,
@@ -58,8 +59,8 @@ selectInput(inputId = "y",
 #    Output: Show scatterplot --------------------------------------
      mainPanel(
        
-       plotOutput(outputId = "scatterplot" , width = 600, height = 400),
-       DT::dataTableOutput(outputId = "bwaytable", width = "80%")
+       plotlyOutput(outputId = "scatterplot"),
+       DT::dataTableOutput(outputId = "bwaytable")
        
      )
    )
@@ -71,17 +72,19 @@ selectInput(inputId = "y",
    
 # Create a subset of data filtering by Year Range ------
    bway_subset <- reactive({
-     req(input$year_range) # ensure availablity of value before proceeding
+     req(input$Year) # ensure availablity of value before proceeding
      bway %>%
-        filter(Year >= input$year_range[1], Year <= input$year_range[2], Theatre == input$z)
+       filter(Year >= input$Year[1], Year <= input$Year[2], Theatre == input$z)
    })
+   
 #
 #   # Create scatterplot object the plotOutput function is expecting --
-   output$scatterplot <- renderPlot({
-     ggplot(data = bway_subset(), aes_string(x = "Month_", 
+   output$scatterplot <- renderPlotly({
+    
+     ggplotly(ggplot(data = bway_subset(), aes_string(x = "Week", 
                                     y = input$y,
                                     color = "Show.Title")) +
-      geom_line(stat="summary", fun.y="mean")
+      geom_line())
      
      })
      
@@ -93,11 +96,8 @@ selectInput(inputId = "y",
                                               )) +
       geom_bar() + labs(x = "Show", y="Number of Weeks") +
       theme(axis.text.x = element_text(angle = 90))
-      #geom_segment(aes(x = "Show.Title", xend= "Show.Title", 0, yend= "count"))
-       
-     
   
-   }) 
+   })
    
    
    
