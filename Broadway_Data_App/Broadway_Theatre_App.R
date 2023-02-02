@@ -12,8 +12,8 @@ gb_type <- read.csv("Donut_Chart_Manipulated.csv")
 
 ui <- fluidPage(
   
-  #   Sidebar --------------------------------------------------------------------------------------------------
-  # Contains a few user input definitions and a bar plot and donut plot  --------------
+#   Sidebar --------------------------------------------------------------------------------------------------
+# Contains a few user input definitions and a bar plot and donut plot  --------------
   
   sidebarLayout(
     
@@ -36,7 +36,7 @@ ui <- fluidPage(
       
       # Select variable for y-axis of scatterplot ----------------------------------
       selectInput(inputId = "y",
-                  label = "Y-axis (Graph on the Right)",
+                  label = "Y-axis (Graph on the Right):",
                   choices = c("Average Capacity Filled (%)" = "Capacity", 
                               "Average Weekly Total Audience Count" = "Attendance",
                               "Average Weekly Gross" = "Gross"),
@@ -48,12 +48,12 @@ ui <- fluidPage(
                     label = "Show data table",
                     value = TRUE),
       
-      #OUTPUT--------------------------
+#OUTPUT--------------------------
       
       # Show barplot with number of weeks each show ran in the chosen year and theatre
       plotOutput(outputId = "barplot"),
       
-      #Show donut chart with a breakdown of musicals and plays at the chosen year and theatre 
+      #Show donut chart with a breakdown of musicals and plays in the chosen year and theatre 
       plotOutput(outputId = "donut")
       
       
@@ -61,8 +61,8 @@ ui <- fluidPage(
     
     
     
-    #Main Panel ------------------------------------------------------------------------------------------------------------------
-    #   OUTPUT contains scatterplot, data table, and download button
+#Main Panel ------------------------------------------------------------------------------------------------------------------
+# OUTPUT contains scatterplot, data table, and download button
     mainPanel(
       
       plotlyOutput(outputId = "scatterplot"),
@@ -96,7 +96,7 @@ server <- function(input, output) {
   })
   
   
-  # #Make another subset reacting to the Year and Theatre chosen aggregated in a unique order to create the donut chart for show type.------
+  #Make another subset reacting to the Year and Theatre chosen aggregated in a unique order to create the donut chart for show type.------
   
   bway_subset_donut <- reactive({
     req(input$Year) # ensure availablity of value before proceeding
@@ -108,7 +108,6 @@ server <- function(input, output) {
   
   # Create scatterplot object the plotOutput function is expecting --
   output$scatterplot <- renderPlotly({
-    
     ggplotly(ggplot(data = bway_subset_scatter(), aes_string(x = "Month", 
                                                              y = input$y,
                                                              color = c("Show"))) +
@@ -117,10 +116,7 @@ server <- function(input, output) {
                ggtitle("Monthly Averages")+
                labs(x = "Month", y = input$y) #updating labels
              
-             
-             
     ) 
-    
     
   })
   
@@ -139,7 +135,6 @@ server <- function(input, output) {
   })
   
   # Create donut plot object the plotOutput function is expecting --
-  
   output$donut <- renderPlot({
     ggplot(bway_subset_donut(), aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Type)) + #fill by show type
       geom_rect() +
