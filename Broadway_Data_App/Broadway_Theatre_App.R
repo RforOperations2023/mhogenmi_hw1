@@ -8,7 +8,7 @@ bway_group_month <- read.csv("Monthly_Avg_Metrics.csv")
 gb_type <- read.csv("Donut_Chart_Manipulated.csv")
 
 
-#Define UI for application that provides Broadway performance metrics by NYC theatres such as average weekly grosses, play v show breakdown, and weeks each show premiered  -----------
+#Define UI for application that provides Broadway performance metrics by NYC theatres -------------------------------------
 
 ui <- fluidPage(
   
@@ -42,7 +42,6 @@ ui <- fluidPage(
                               "Average Weekly Gross" = "Gross"),
                   selected = "Capacity"),
       
-      
       # Show data table -------------------------------
       checkboxInput(inputId = "show_data",
                     label = "Show data table",
@@ -60,10 +59,9 @@ ui <- fluidPage(
     ),
     
     
-    
 #Main Panel ------------------------------------------------------------------------------------------------------------------
 # OUTPUT contains scatterplot, data table, and download button
-    mainPanel(
+  mainPanel(
       
       plotlyOutput(outputId = "scatterplot"),
       DT::dataTableOutput(outputId = "bwaytable"),
@@ -79,45 +77,43 @@ server <- function(input, output) {
   
   
   # Create a subset of data reacting to the Year and Theatre chosen. This is for the bar plot.-------
-  bway_subset <- reactive({
-    req(input$Year) # ensure availablity of value before proceeding
-    bway %>%
-      filter(Year == input$Year,
+    bway_subset <- reactive({
+     req(input$Year) # ensure availablity of value before proceeding
+      bway %>%
+        filter(Year == input$Year,
              Theatre == input$z)
   })
   
   #Make another subset reacting to the Year and Theatre chosen grouped by month for the average metric scatterplot----- 
   
-  bway_subset_scatter <- reactive({
-    req(input$Year)
-    bway_group_month %>%
-      filter(Year == input$Year,
+    bway_subset_scatter <- reactive({
+     req(input$Year)
+     bway_group_month %>%
+        filter(Year == input$Year,
              Theatre == input$z)
   })
   
   
-  #Make another subset reacting to the Year and Theatre chosen aggregated in a unique order to create the donut chart for show type.------
+  #Make another subset reacting to the Year and Theatre chosen aggregated to create the donut chart for show type.------
   
-  bway_subset_donut <- reactive({
-    req(input$Year) # ensure availablity of value before proceeding
-    gb_type %>%
-      filter(Year == input$Year,
+   bway_subset_donut <- reactive({
+     req(input$Year) # ensure availablity of value before proceeding
+     gb_type %>%
+        filter(Year == input$Year,
              Theatre == input$z)
   })
   
   
   # Create scatterplot object the plotOutput function is expecting --
-  output$scatterplot <- renderPlotly({
-    ggplotly(ggplot(data = bway_subset_scatter(), aes_string(x = "Month", 
-                                                             y = input$y,
-                                                             color = c("Show"))) +
-               geom_point()+  
-               scale_x_discrete(limits=c("January", "February","March","April",'May',"June","July","August",'September',"October","November","December"))+ #rename tick marks
-               ggtitle("Monthly Averages")+
-               labs(x = "Month", y = input$y)+ #updating labels
+    output$scatterplot <- renderPlotly({
+      ggplotly(ggplot(data = bway_subset_scatter(), aes_string(x = "Month", y = input$y,color = c("Show"))) +
+         geom_point()+  
+         scale_x_discrete(limits=c("January", "February","March","April",'May',"June","July","August",'September',"October","November","December"))+ #rename tick marks
+         ggtitle("Monthly Averages")+
+         labs(x = "Month", y = input$y)+ #updating labels
                theme_minimal()+
-               theme(axis.text.x = element_text(angle = 45)) +  #rotate axis tick labels
-               theme(plot.title = element_text(hjust = 0.5))
+         theme(axis.text.x = element_text(angle = 45)) +  #rotate axis tick labels
+         theme(plot.title = element_text(hjust = 0.5))
              
     ) 
     
@@ -125,38 +121,39 @@ server <- function(input, output) {
   
   
   # Create barplot object the plotOutput function is expecting --
-  output$barplot <- renderPlot({
-    ggplot(data = bway_subset(), aes_string(x ="Show",
+    output$barplot <- renderPlot({
+      ggplot(data = bway_subset(), aes_string(x ="Show",
                                             fill = "Show" 
     )) +
-      geom_bar() + labs(x = "Show", y="Number of Weeks") +
-      theme(axis.text.x = element_text(angle = 90))+ #rotating axis tick labels 
-      ggtitle("Number of Weeks in Theatre")+
-      theme_minimal()+
-      theme(plot.title = element_text(hjust = 0.5))
+        geom_bar()+
+        labs(x = "Show", y="Number of Weeks") +
+        theme(axis.text.x = element_text(angle = 90))+ #rotating axis tick labels 
+        ggtitle("Number of Weeks in Theatre")+
+        theme_minimal()+
+        theme(plot.title = element_text(hjust = 0.5))
     
   })
   
   # Create donut plot object the plotOutput function is expecting --
-  output$donut <- renderPlot({
-    ggplot(bway_subset_donut(), aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Type)) + #fill by show type
-      geom_rect() +
-      coord_polar(theta="y") + 
-      xlim(c(2, 4))  + 
-      geom_label( x=3.5, aes(y=labelPosition, label=label), size=4) +
-      ggtitle("Number of Weeks Plays and Musicals Produced by Theatre")+
-      theme_void()+ #create minimal view without the coordinates behind plot
-      theme(legend.position = "none")+ #remove legend
-      theme(plot.title = element_text(hjust = 0.5))
+    output$donut <- renderPlot({
+      ggplot(bway_subset_donut(), aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Type)) + #fill by show type
+        geom_rect() +
+        coord_polar(theta="y") + 
+        xlim(c(2, 4))  + 
+        geom_label( x=3.5, aes(y=labelPosition, label=label), size=4) +
+        ggtitle("Number of Weeks Plays and Musicals Produced by Theatre")+
+        theme_void()+ #create minimal view without the coordinates behind plot
+        theme(legend.position = "none")+ #remove legend
+        theme(plot.title = element_text(hjust = 0.5))
   })
   
   
   #Download Data as Broadway Data + Year Chosen
-  output$download <- downloadHandler(
-    filename = function() { 
+    output$download <- downloadHandler(
+      filename = function() { 
       paste("Broadway Data ", input$Year, ".csv", sep="")
     },
-    content = function(file) {
+      content = function(file) {
       write.csv(bway, file)
     })
   
@@ -164,8 +161,8 @@ server <- function(input, output) {
   
   
   # Print data table if checked -------------------------------------
-  output$bwaytable <- DT::renderDataTable(
-    if(input$show_data){
+    output$bwaytable <- DT::renderDataTable(
+      if(input$show_data){
       DT::datatable(data = bway_subset()[, 2:9], #selecting desired columns 
                     options = list(pageLength = 10), 
                     rownames = FALSE)
