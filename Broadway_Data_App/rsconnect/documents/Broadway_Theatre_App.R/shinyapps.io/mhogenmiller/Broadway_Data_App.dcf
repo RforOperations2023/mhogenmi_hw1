@@ -1,0 +1,13 @@
+name: Broadway_Data_App
+title: Broadway_Data_App
+username:
+account: mhogenmiller
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8210028
+bundleId: 6804052
+url: https://mhogenmiller.shinyapps.io/Broadway_Data_App/
+when: 1675379370.4577
+lastSyncTime: 1675379370.45771
+asMultiple: FALSE
+asStatic: FALSE

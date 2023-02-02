@@ -111,11 +111,12 @@ server <- function(input, output) {
     ggplotly(ggplot(data = bway_subset_scatter(), aes_string(x = "Month", 
                                                              y = input$y,
                                                              color = c("Show"))) +
-               geom_point() +  theme(axis.text.x = element_text(angle = 45)) +  #rotate axis tick labels
+               geom_point()+  
                scale_x_discrete(limits=c("January", "February","March","April",'May',"June","July","August",'September',"October","November","December"))+ #rename tick marks
                ggtitle("Monthly Averages")+
                labs(x = "Month", y = input$y)+ #updating labels
                theme_minimal()+
+               theme(axis.text.x = element_text(angle = 45)) +  #rotate axis tick labels
                theme(plot.title = element_text(hjust = 0.5))
              
     ) 
