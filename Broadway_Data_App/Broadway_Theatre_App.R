@@ -114,7 +114,9 @@ server <- function(input, output) {
                geom_point() +  theme(axis.text.x = element_text(angle = 45)) +  #rotate axis tick labels
                scale_x_discrete(limits=c("January", "February","March","April",'May',"June","July","August",'September',"October","November","December"))+ #rename tick marks
                ggtitle("Monthly Averages")+
-               labs(x = "Month", y = input$y) #updating labels
+               labs(x = "Month", y = input$y)+ #updating labels
+               theme_minimal()+
+               theme(plot.title = element_text(hjust = 0.5))
              
     ) 
     
@@ -129,8 +131,8 @@ server <- function(input, output) {
       geom_bar() + labs(x = "Show", y="Number of Weeks") +
       theme(axis.text.x = element_text(angle = 90))+ #rotating axis tick labels 
       ggtitle("Number of Weeks in Theatre")+
-      theme(plot.title = element_text(hjust = 0.5))+
-      theme_minimal()
+      theme_minimal()+
+      theme(plot.title = element_text(hjust = 0.5))
     
   })
   
@@ -141,9 +143,10 @@ server <- function(input, output) {
       coord_polar(theta="y") + 
       xlim(c(2, 4))  + 
       geom_label( x=3.5, aes(y=labelPosition, label=label), size=4) +
-      ggtitle("Number of Weeks Plays v Musicals Produced by Theatre")+
+      ggtitle("Number of Weeks Plays and Musicals Produced by Theatre")+
       theme_void()+ #create minimal view without the coordinates behind plot
-      theme(legend.position = "none") #remove legend
+      theme(legend.position = "none")+ #remove legend
+      theme(plot.title = element_text(hjust = 0.5))
   })
   
   
